@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Name App</title>
+</head>
+<body>
+    <h1>Enter Your Name</h1>
+
+    <form id="nameForm">
+        <input type="text" id="nameInput" placeholder="Enter your name" required />
+        <button type="submit">Save</button>
+    </form>
+
+    <h2>Saved Names:</h2>
+    <ul id="nameList"></ul>
+
+    <script>
+        // Load names on page load
+        function loadNames() {
+            fetch("/names")
+                .then(res => res.json())
+                .then(data => {
+                    let list = document.getElementById("nameList");
+                    list.innerHTML = "";
+                    data.forEach(item => {
+                        let li = document.createElement("li");
+                        li.textContent = item.name;
+                        list.appendChild(li);
+                    });
+                });
+        }
+
+        // Handle form submit
+        document.getElementById("nameForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+            let name = document.getElementById("nameInput").value;
+
+            fetch("/name", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name: name })
+            })
+            .then(() => {
+                document.getElementById("nameInput").value = "";
+                loadNames(); // refresh list automatically
+            });
+        });
+
+        // Load on start
+        loadNames();
+    </script>
+</body>
+</html>
